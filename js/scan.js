@@ -48,3 +48,38 @@ const html5QrcodeScanner = new Html5QrcodeScanner(
   "qr-reader", { fps: 10, qrbox: 250 }
 );
 html5QrcodeScanner.render(onScanSuccess);
+
+function onScanSuccess(decodedText, decodedResult) {
+  const users = JSON.parse(localStorage.getItem('users') || '[]');
+  const index = users.findIndex(u => u.id === decodedText);
+
+  if (index === -1) {
+    Swal.fire('Not Found', 'QR code not matched with any user.', 'error');
+    return;
+  }
+
+  const user = users[index];
+
+  // ✅ Check if already scanned for the current mode
+  if (user.scan[scanMode]) {
+    Swal.fire({
+      icon: 'info',
+      title: 'Already Scanned',
+      text: `${scanMode.charAt(0).toUpperCase() + scanMode.slice(1)} already marked for ${user.name}.`,
+    });
+    return;
+  }
+
+  // ✅ Mark scan for current mode
+  user.scan[scanMode] = true;
+  localStorage.setItem('users', JSON.stringify(users));
+
+  // ✅ Show success message only once
+  Swal.fire({
+    icon: 'success',
+    title: 'Scan Successful',
+    text: `${scanMode.charAt(0).toUpperCase() + scanMode.slice(1)} marked for ${user.name}`,
+  });
+
+  updateTable();
+}
