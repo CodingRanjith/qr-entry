@@ -10,79 +10,158 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
       font-family: 'Poppins', sans-serif;
-      background: linear-gradient(to right, #1ab79d, #0e6d5d);
-      min-height: 100vh;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
       display: flex;
       justify-content: center;
       align-items: center;
+      height: 100vh;
+      overflow: hidden;
     }
 
-    .card {
-      border: none;
+    .glass-card {
+      background: rgba(255, 255, 255, 0.1);
       border-radius: 20px;
-      padding: 2rem;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-      background-color: #ffffff;
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      padding: 3rem 2rem;
+      width: 90%;
+      max-width: 420px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      animation: fadeIn 1.2s ease-in-out;
     }
 
-    h2 {
-      font-weight: 600;
-      color: #1ab79d;
+    @keyframes fadeIn {
+      0% {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .glass-card h2 {
+      font-size: 1.8rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: #00ffc6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .glass-card img {
+      width: 28px;
+      height: 28px;
     }
 
     label {
+      display: block;
+      margin-bottom: 0.4rem;
       font-weight: 500;
-      color: #444;
+      color: #e0f7fa;
     }
 
-    .btn-primary {
-      background: #1ab79d;
-      border: none;
-      border-radius: 12px;
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"] {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1.2rem;
+      border: 2px solid transparent;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 14px;
+      backdrop-filter: blur(5px);
+      transition: 0.3s;
+    }
+
+    input::placeholder {
+      color: #ccc;
+    }
+
+    input:focus,
+    input:hover {
+      outline: none;
+      border-color: #00ffc6;
+      box-shadow: 0 0 10px #00ffc6, 0 0 20px #00ffc6;
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 0.75rem;
+      margin-top: 0.5rem;
       font-weight: 600;
+      border: 2px solid transparent;
+      border-radius: 10px;
+      cursor: pointer;
+      color: #fff;
+      background: linear-gradient(135deg, #00ffc6, #00c2ff);
+      box-shadow: 0 0 12px rgba(0, 255, 198, 0.5);
+      transition: transform 0.2s ease-in-out, box-shadow 0.3s;
     }
 
-    #qrcode canvas {
+    .btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px #00ffc6, 0 0 25px #00c2ff, 0 0 40px #00ffc6;
+      border-color: #00ffc6;
+    }
+
+    .btn.scanner {
       margin-top: 1rem;
-      border: 2px dashed #1ab79d;
-      padding: 1rem;
-      border-radius: 12px;
-      background: #f8f9fa;
+      background: linear-gradient(135deg, #ff6ec4, #7873f5);
+      box-shadow: 0 0 12px rgba(255, 110, 196, 0.5);
+    }
+
+    .btn.scanner:hover {
+      box-shadow: 0 0 15px #ff6ec4, 0 0 25px #7873f5, 0 0 40px #ff6ec4;
+      border-color: #ff6ec4;
+    }
+
+    #qrcode{
+      height: 150px;
+      width: 150px;
+
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-md-6">
-        <div class="card text-center">
-          <h2 class="mb-4">🎉 Register for the Mega Event</h2>
-          <form id="registerForm" class="text-start">
-            <div class="mb-3">
-              <label for="name" class="form-label">Full Name</label>
-              <input type="text" class="form-control" id="name" placeholder="e.g. John Doe" required>
-            </div>
-            <div class="mb-3">
-              <label for="email" class="form-label">Email</label>
-              <input type="email" class="form-control" id="email" placeholder="e.g. john@example.com" required>
-            </div>
-            <div class="mb-3">
-              <label for="phone" class="form-label">Phone</label>
-              <input type="text" class="form-control" id="phone" placeholder="e.g. 9876543210" required>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Register & Generate QR</button>
-          </form>
-          <div id="qrcode" class="mt-4"></div>
 
-          <br>
+  <div class="glass-card">
+    <h2><img src="https://img.icons8.com/emoji/48/party-popper.png" alt="🎉"> Mega Event Registration</h2>
+    <form id="registerForm">
+      <label for="fullname">Full Name</label>
+      <input type="text" id="name" placeholder="e.g. John Doe">
 
-          <a href="scan.html" class="btn btn-success">Scanner</a>
-        </div>
-      </div>
-    </div>
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="e.g. john@example.com">
+
+      <label for="phone">Phone</label>
+      <input type="tel" id="phone" placeholder="e.g. 9876543210">
+
+      <button class="btn" type="submit">Register & Generate QR</button>
+
+      <div id="qrcode" class="mt-4"></div>
+      <!-- <button class="btn scanner" type="button">Scanner</button> -->
+    </form>
+    <a href="scan.html" class="btn btn-success">Scanner</a>
   </div>
+ 
   <script src="js/register.js"></script>
+
 </body>
 </html>
