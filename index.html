@@ -122,23 +122,35 @@
     }
 
     .btn.scanner {
+      background: linear-gradient(135deg, #ff4dc4, #ff6ec4);
+      box-shadow: 0 0 15px #ff4dc4, 0 0 30px #ff6ec4, 0 0 45px #ff4dc4;
       margin-top: 1rem;
-      background: linear-gradient(135deg, #ff6ec4, #7873f5);
-      box-shadow: 0 0 12px rgba(255, 110, 196, 0.5);
     }
 
     .btn.scanner:hover {
-      box-shadow: 0 0 15px #ff6ec4, 0 0 25px #7873f5, 0 0 40px #ff6ec4;
-      border-color: #ff6ec4;
+      box-shadow: 0 0 20px #ff4dc4, 0 0 40px #ff6ec4, 0 0 60px #ff4dc4;
+      border-color: #ff4dc4;
     }
 
-    #qrcode{
-      height: 150px;
-      width: 150px;
+    #qrcode {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+        margin-bottom: 20px;
+      }
 
+    /* Remove default anchor styles inside button */
+    .btn a {
+      text-decoration: none;
+      color: white;
+      display: block;
+      width: 100%;
+      height: 100%;
     }
   </style>
 </head>
+
 <body>
 
   <div class="glass-card">
@@ -155,13 +167,16 @@
 
       <button class="btn" type="submit">Register & Generate QR</button>
 
-      <div id="qrcode" class="mt-4"></div>
-      <!-- <button class="btn scanner" type="button">Scanner</button> -->
+      <!-- Pink Neon Scanner Button -->
+      <div id="qrcode" class="mt-4" style="text-align:center;"></div>
+      <button class="btn scanner" type="button">
+        <a href="scan.html">Scanner</a>
+      </button>
     </form>
-    <a href="scan.html" class="btn btn-success">Scanner</a>
   </div>
- 
+
   <script src="js/register.js"></script>
 
 </body>
+
 </html>
