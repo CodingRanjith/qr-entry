@@ -1,182 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>🎫 Event Registration</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QR Scanner & Member Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    .glass-card {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 20px;
-      backdrop-filter: blur(15px);
-      -webkit-backdrop-filter: blur(15px);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-      padding: 3rem 2rem;
-      width: 90%;
-      max-width: 420px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: #ffffff;
-      animation: fadeIn 1.2s ease-in-out;
-    }
-
-    @keyframes fadeIn {
-      0% {
-        transform: translateY(20px);
-        opacity: 0;
-      }
-      100% {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
-
-    .glass-card h2 {
-      font-size: 1.8rem;
-      text-align: center;
-      margin-bottom: 1.5rem;
-      color: #00ffc6;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-
-    .glass-card img {
-      width: 28px;
-      height: 28px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 0.4rem;
-      font-weight: 500;
-      color: #e0f7fa;
-    }
-
-    input[type="text"],
-    input[type="email"],
-    input[type="tel"] {
-      width: 100%;
-      padding: 0.75rem;
-      margin-bottom: 1.2rem;
-      border: 2px solid transparent;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.2);
-      color: #fff;
-      font-size: 14px;
-      backdrop-filter: blur(5px);
-      transition: 0.3s;
-    }
-
-    input::placeholder {
-      color: #ccc;
-    }
-
-    input:focus,
-    input:hover {
-      outline: none;
-      border-color: #00ffc6;
-      box-shadow: 0 0 10px #00ffc6, 0 0 20px #00ffc6;
-      background: rgba(255, 255, 255, 0.25);
-    }
-
-    .btn {
-      width: 100%;
-      padding: 0.75rem;
-      margin-top: 0.5rem;
-      font-weight: 600;
-      border: 2px solid transparent;
-      border-radius: 10px;
-      cursor: pointer;
-      color: #fff;
-      background: linear-gradient(135deg, #00ffc6, #00c2ff);
-      box-shadow: 0 0 12px rgba(0, 255, 198, 0.5);
-      transition: transform 0.2s ease-in-out, box-shadow 0.3s;
-    }
-
-    .btn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 15px #00ffc6, 0 0 25px #00c2ff, 0 0 40px #00ffc6;
-      border-color: #00ffc6;
-    }
-
-    .btn.scanner {
-      background: linear-gradient(135deg, #ff4dc4, #ff6ec4);
-      box-shadow: 0 0 15px #ff4dc4, 0 0 30px #ff6ec4, 0 0 45px #ff4dc4;
-      margin-top: 1rem;
-    }
-
-    .btn.scanner:hover {
-      box-shadow: 0 0 20px #ff4dc4, 0 0 40px #ff6ec4, 0 0 60px #ff4dc4;
-      border-color: #ff4dc4;
-    }
-
-    #qrcode {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-top: 20px;
-        margin-bottom: 20px;
-      }
-
-    /* Remove default anchor styles inside button */
-    .btn a {
-      text-decoration: none;
-      color: white;
-      display: block;
-      width: 100%;
-      height: 100%;
-    }
-  </style>
 </head>
-
 <body>
+  <div class="container-fluid">
+    <div class="row flex-column flex-md-row">
+      <nav class="col-md-3 bg-dark text-white p-4 sidebar">
+        <h5 class="mb-4">📋 Dashboard Options</h5>
+        <button class="btn btn-outline-light w-100 mb-2 scan-btn" data-type="entry">Entry Scan</button>
+        <button class="btn btn-outline-light w-100 mb-2 scan-btn" data-type="food">Food Scan</button>
+        <button class="btn btn-outline-light w-100 mb-3 scan-btn" data-type="gift">Gift Scan</button>
 
-  <div class="glass-card">
-    <h2><img src="https://img.icons8.com/emoji/48/party-popper.png" alt="🎉"> Mega Event Registration</h2>
-    <form id="registerForm">
-      <label for="fullname">Full Name</label>
-      <input type="text" id="name" placeholder="e.g. John Doe">
+        <input type="file" id="excelFile" class="form-control mb-2" />
+        <button class="btn btn-success w-100 mb-2" onclick="uploadExcel()">📥 Upload Excel</button>
+        <button class="btn btn-info w-100" onclick="exportToExcel()">📤 Export to Excel</button>
+      </nav>
 
-      <label for="email">Email</label>
-      <input type="email" id="email" placeholder="e.g. john@example.com">
+      <main class="col-md-9 p-4">
+        <h2 class="mb-3 text-center text-md-start">🧾 Current Mode: <span id="currentMode">Entry</span></h2>
 
-      <label for="phone">Phone</label>
-      <input type="tel" id="phone" placeholder="e.g. 9876543210">
+        <div class="d-flex justify-content-center mb-4">
+          <div id="qr-reader" style="width: 300px;"></div>
+        </div>
 
-      <button class="btn" type="submit">Register & Generate QR</button>
+        <input type="text" id="searchInput" class="form-control mb-3" placeholder="🔍 Search Name..." />
 
-      <!-- Pink Neon Scanner Button -->
-      <div id="qrcode" class="mt-4" style="text-align:center;"></div>
-      <button class="btn scanner" type="button">
-        <a href="scan.html">Scanner</a>
-      </button>
-    </form>
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover table-striped">
+            <thead class="table-dark">
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>QR Code</th>
+                <th>Download</th>
+                <th>Entry</th>
+                <th>Food</th>
+                <th>Gift</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </main>
+    </div>
   </div>
 
-  <script src="js/register.js"></script>
-
+  <script src="js/scan.js"></script>
 </body>
-
 </html>
