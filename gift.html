@@ -57,7 +57,7 @@
     <a href="index.html" class="btn btn-outline-primary">🏠 Back to Main Dashboard</a>
   </div>
 
-  
+
     <div class="text-center mb-4">
       <h2 class="scan-title">🎁 SCAN MODE: <span id="scanModeTitle">GIFT</span></h2>
     </div>
@@ -125,19 +125,29 @@
       });
     }
   
-    function onScanSuccess(decodedText) {
-      const found = members.find(m => m.name === decodedText.trim());
-      if (!found) {
-        return Swal.fire("Error", "Name not found in Excel list", "error");
-      }
-      if (found.scan?.[scanMode]) {
-        return Swal.fire("Already Scanned", `${scanMode.toUpperCase()} already marked for ${found.name}`, "info");
-      }
-      found.scan[scanMode] = true;
-      localStorage.setItem("members", JSON.stringify(members));
-      Swal.fire("Success", `${scanMode.toUpperCase()} marked for ${found.name}`, "success");
-      renderScanTable();
+    const alreadyWarned = new Set();
+
+function onScanSuccess(decodedText) {
+  const found = members.find(m => m.name === decodedText.trim());
+
+  if (!found) {
+    return Swal.fire("Error", "Name not found in Excel list", "error");
+  }
+
+  if (found.scan?.[scanMode]) {
+    if (!alreadyWarned.has(found.name)) {
+      alreadyWarned.add(found.name);
+      return Swal.fire("Already Scanned", `${scanMode.toUpperCase()} already marked for ${found.name}`, "info");
     }
+    return; // silently ignore further scans for same user
+  }
+
+  found.scan[scanMode] = true;
+  localStorage.setItem("members", JSON.stringify(members));
+  Swal.fire("Success", `${scanMode.toUpperCase()} marked for ${found.name}`, "success");
+  renderScanTable();
+}
+
   
     window.onload = () => {
       const stored = localStorage.getItem("members");
