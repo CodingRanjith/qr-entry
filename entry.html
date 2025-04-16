@@ -74,19 +74,41 @@
   </div>
 
   <script>
-    let scanMode = "entry"; // change to "food" or "gift" as needed
+    let scanMode = "entry"; // "food" or "gift"
     let members = [];
-
+  
     document.getElementById("scanModeTitle").textContent = scanMode.toUpperCase();
-
+  
+    async function loadExcelFromServer() {
+      try {
+        const response = await fetch("data/users.xlsx");
+        const arrayBuffer = await response.arrayBuffer();
+        const workbook = XLSX.read(arrayBuffer, { type: "array" });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const raw = XLSX.utils.sheet_to_json(sheet);
+  
+        members = raw.map((r, i) => ({
+          id: (r["S.No"] || i + 1).toString(),
+          name: r["BB MEET PAID MEMBERS LIST"]?.trim() || `Member ${i + 1}`,
+          scan: { entry: false, food: false, gift: false }
+        }));
+  
+        localStorage.setItem("members", JSON.stringify(members));
+        renderScanTable();
+        Swal.fire("Loaded", "Data loaded from server Excel file", "success");
+      } catch (err) {
+        console.error("Excel fetch error:", err);
+        Swal.fire("Error", "Failed to load Excel file", "error");
+      }
+    }
+  
     function renderScanTable() {
       const tableBody = document.getElementById("scanTableBody");
       tableBody.innerHTML = "";
-
+  
       members.forEach((m, i) => {
         const tr = document.createElement("tr");
-        const status = m.scan[scanMode] ? "✅" : "❌";
-
+        const status = m.scan?.[scanMode] ? "✅" : "❌";
         tr.innerHTML = `
           <td>${i + 1}</td>
           <td>${m.name}</td>
@@ -95,13 +117,13 @@
         tableBody.appendChild(tr);
       });
     }
-
+  
     function onScanSuccess(decodedText) {
       const found = members.find(m => m.name === decodedText.trim());
       if (!found) {
-        return Swal.fire("Error", "Name not found in list", "error");
+        return Swal.fire("Error", "Name not found in Excel list", "error");
       }
-      if (found.scan[scanMode]) {
+      if (found.scan?.[scanMode]) {
         return Swal.fire("Already Scanned", `${scanMode.toUpperCase()} already marked for ${found.name}`, "info");
       }
       found.scan[scanMode] = true;
@@ -109,15 +131,18 @@
       Swal.fire("Success", `${scanMode.toUpperCase()} marked for ${found.name}`, "success");
       renderScanTable();
     }
-
+  
     window.onload = () => {
       const stored = localStorage.getItem("members");
       if (stored) {
         members = JSON.parse(stored);
         renderScanTable();
+      } else {
+        loadExcelFromServer();
       }
       new Html5QrcodeScanner("qr-reader", { fps: 10, qrbox: 250 }).render(onScanSuccess);
     };
   </script>
+  
 </body>
 </html>
