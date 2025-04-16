@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BB Meet | Candidate Details</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+  <div class="container py-5">
+    <h2 class="text-center mb-4">👤 Candidate List</h2>
+
+    <div class="row mb-4">
+      <div class="col-md-6 mb-2">
+        <input type="file" class="form-control" id="excelFile" />
+      </div>
+      <div class="col-md-3 mb-2">
+        <button class="btn btn-success w-100" onclick="uploadExcel()">📥 Upload Excel</button>
+      </div>
+      <div class="col-md-3 mb-2">
+        <button class="btn btn-info w-100" onclick="exportToExcel()">📤 Export to Excel</button>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6 mx-auto">
+        <input type="text" id="searchInput" class="form-control" placeholder="🔍 Search by name..." />
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover table-striped text-center">
+        <thead class="table-dark">
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>QR Code</th>
+            <th>Download</th>
+            <th>Share Link</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    let members = [];
+    
+    document.getElementById("searchInput").addEventListener("input", function () {
+      const query = this.value.toLowerCase();
+      const filtered = members.filter(m => m.name.toLowerCase().includes(query));
+      renderTable(filtered);
+    });
+    
+    // 🔁 AUTO LOAD FROM /data/users.xlsx
+    async function loadExcelFromServer() {
+      try {
+        const response = await fetch('data/users.xlsx');
+        const arrayBuffer = await response.arrayBuffer();
+        const workbook = XLSX.read(arrayBuffer, { type: "array" });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const raw = XLSX.utils.sheet_to_json(sheet);
+    
+        members = raw.map((r, i) => ({
+          id: (r["S.No"] || i + 1).toString(),
+          name: r["BB MEET PAID MEMBERS LIST"]?.trim() || `Member ${i + 1}`
+        }));
+    
+        localStorage.setItem("members", JSON.stringify(members));
+        renderTable(members);
+        Swal.fire("Loaded!", "Excel data loaded from server!", "success");
+    
+      } catch (error) {
+        console.error("Failed to load Excel file:", error);
+        Swal.fire("Error", "Unable to load users.xlsx from server.", "error");
+      }
+    }
+    
+    function renderTable(data) {
+      const table = document.getElementById("tableBody");
+      table.innerHTML = "";
+    
+      data.forEach((m, i) => {
+        const qrCanvas = document.createElement("canvas");
+        QRCode.toCanvas(qrCanvas, m.name);
+    
+        const dlBtn = document.createElement("button");
+        dlBtn.className = "btn btn-sm btn-primary";
+        dlBtn.textContent = "Download";
+        dlBtn.onclick = () => {
+          const link = document.createElement("a");
+          link.download = `${m.name.replace(/\s+/g, '_')}_QR.png`;
+          link.href = qrCanvas.toDataURL();
+          link.click();
+        };
+    
+        const shareBtn = document.createElement("button");
+        shareBtn.className = "btn btn-sm btn-outline-secondary";
+        shareBtn.textContent = "Copy";
+        shareBtn.onclick = () => {
+          const link = `${window.location.origin}/candidate.html?id=${encodeURIComponent(m.name)}`;
+          navigator.clipboard.writeText(link);
+          Swal.fire("Copied!", "QR share link copied to clipboard.", "success");
+        };
+    
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${i + 1}</td>
+          <td>${m.name}</td>
+        `;
+    
+        const qrCell = document.createElement("td");
+        qrCell.appendChild(qrCanvas);
+    
+        const dlCell = document.createElement("td");
+        dlCell.appendChild(dlBtn);
+    
+        const shareCell = document.createElement("td");
+        shareCell.appendChild(shareBtn);
+    
+        row.appendChild(qrCell);
+        row.appendChild(dlCell);
+        row.appendChild(shareCell);
+    
+        table.appendChild(row);
+      });
+    }
+    
+    function exportToExcel() {
+      const data = members.map((m, i) => ({
+        SNo: i + 1,
+        Name: m.name
+      }));
+    
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Candidates");
+      XLSX.writeFile(wb, "BB_Meet_Candidates.xlsx");
+    }
+    
+    // 🚀 On load
+    window.onload = () => {
+      const stored = localStorage.getItem("members");
+      if (stored) {
+        members = JSON.parse(stored);
+        renderTable(members);
+      } else {
+        loadExcelFromServer();
+      }
+    };
+    </script>
+    
+</body>
+</html>
