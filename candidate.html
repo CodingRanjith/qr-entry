@@ -40,7 +40,7 @@
             <th>Name</th>
             <th>QR Code</th>
             <th>Download</th>
-            <th>Share Link</th>
+            <th>QR Preview Link</th>
           </tr>
         </thead>
         <tbody id="tableBody"></tbody>
@@ -50,14 +50,13 @@
 
   <script>
     let members = [];
-    
+
     document.getElementById("searchInput").addEventListener("input", function () {
       const query = this.value.toLowerCase();
       const filtered = members.filter(m => m.name.toLowerCase().includes(query));
       renderTable(filtered);
     });
-    
-    // 🔁 AUTO LOAD FROM /data/users.xlsx
+
     async function loadExcelFromServer() {
       try {
         const response = await fetch('data/users.xlsx');
@@ -65,30 +64,29 @@
         const workbook = XLSX.read(arrayBuffer, { type: "array" });
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
         const raw = XLSX.utils.sheet_to_json(sheet);
-    
+
         members = raw.map((r, i) => ({
           id: (r["S.No"] || i + 1).toString(),
           name: r["BB MEET PAID MEMBERS LIST"]?.trim() || `Member ${i + 1}`
         }));
-    
+
         localStorage.setItem("members", JSON.stringify(members));
         renderTable(members);
         Swal.fire("Loaded!", "Excel data loaded from server!", "success");
-    
       } catch (error) {
         console.error("Failed to load Excel file:", error);
         Swal.fire("Error", "Unable to load users.xlsx from server.", "error");
       }
     }
-    
+
     function renderTable(data) {
       const table = document.getElementById("tableBody");
       table.innerHTML = "";
-    
+
       data.forEach((m, i) => {
         const qrCanvas = document.createElement("canvas");
         QRCode.toCanvas(qrCanvas, m.name);
-    
+
         const dlBtn = document.createElement("button");
         dlBtn.className = "btn btn-sm btn-primary";
         dlBtn.textContent = "Download";
@@ -98,52 +96,51 @@
           link.href = qrCanvas.toDataURL();
           link.click();
         };
-    
+
         const shareBtn = document.createElement("button");
         shareBtn.className = "btn btn-sm btn-outline-secondary";
-        shareBtn.textContent = "Copy";
+        shareBtn.textContent = "Copy QR Link";
         shareBtn.onclick = () => {
-          const link = `${window.location.origin}/candidate.html?id=${encodeURIComponent(m.name)}`;
+          const link = `${window.location.origin}/preview.html?name=${encodeURIComponent(m.name)}`;
           navigator.clipboard.writeText(link);
-          Swal.fire("Copied!", "QR share link copied to clipboard.", "success");
+          Swal.fire("Copied!", "QR preview link copied to clipboard.", "success");
         };
-    
+
         const row = document.createElement("tr");
         row.innerHTML = `
           <td>${i + 1}</td>
           <td>${m.name}</td>
         `;
-    
+
         const qrCell = document.createElement("td");
         qrCell.appendChild(qrCanvas);
-    
+
         const dlCell = document.createElement("td");
         dlCell.appendChild(dlBtn);
-    
+
         const shareCell = document.createElement("td");
         shareCell.appendChild(shareBtn);
-    
+
         row.appendChild(qrCell);
         row.appendChild(dlCell);
         row.appendChild(shareCell);
-    
+
         table.appendChild(row);
       });
     }
-    
+
     function exportToExcel() {
       const data = members.map((m, i) => ({
         SNo: i + 1,
         Name: m.name
       }));
-    
+
       const ws = XLSX.utils.json_to_sheet(data);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "Candidates");
       XLSX.writeFile(wb, "BB_Meet_Candidates.xlsx");
     }
-    
-    // 🚀 On load
+
     window.onload = () => {
       const stored = localStorage.getItem("members");
       if (stored) {
@@ -153,7 +150,6 @@
         loadExcelFromServer();
       }
     };
-    </script>
-    
+  </script>
 </body>
 </html>
