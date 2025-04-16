@@ -13,11 +13,11 @@
 <body>
   <div class="container py-5">
 
-     <!-- 🔙 Back button -->
-  <div class="text-center mb-3">
-    <a href="index.html" class="btn btn-outline-primary">🏠 Back to Main Dashboard</a>
-  </div>
-  
+    <!-- 🔙 Back button -->
+    <div class="text-center mb-3">
+      <a href="index.html" class="btn btn-outline-primary">🏠 Back to Main Dashboard</a>
+    </div>
+
     <h2 class="text-center mb-4">👤 Candidate List</h2>
 
     <div class="row mb-4">
@@ -47,6 +47,9 @@
             <th>QR Code</th>
             <th>Download</th>
             <th>QR Preview Link</th>
+            <th>Entry</th>
+            <th>Food</th>
+            <th>Gift</th>
           </tr>
         </thead>
         <tbody id="tableBody"></tbody>
@@ -73,7 +76,8 @@
 
         members = raw.map((r, i) => ({
           id: (r["S.No"] || i + 1).toString(),
-          name: r["BB MEET PAID MEMBERS LIST"]?.trim() || `Member ${i + 1}`
+          name: r["BB MEET PAID MEMBERS LIST"]?.trim() || `Member ${i + 1}`,
+          scan: { entry: false, food: false, gift: false }
         }));
 
         localStorage.setItem("members", JSON.stringify(members));
@@ -131,6 +135,12 @@
         row.appendChild(dlCell);
         row.appendChild(shareCell);
 
+        ["entry", "food", "gift"].forEach(type => {
+          const statusCell = document.createElement("td");
+          statusCell.textContent = m.scan?.[type] ? "✅" : "❌";
+          row.appendChild(statusCell);
+        });
+
         table.appendChild(row);
       });
     }
@@ -138,7 +148,10 @@
     function exportToExcel() {
       const data = members.map((m, i) => ({
         SNo: i + 1,
-        Name: m.name
+        Name: m.name,
+        Entry: m.scan?.entry ? "Yes" : "No",
+        Food: m.scan?.food ? "Yes" : "No",
+        Gift: m.scan?.gift ? "Yes" : "No"
       }));
 
       const ws = XLSX.utils.json_to_sheet(data);
@@ -157,5 +170,10 @@
       }
     };
   </script>
+
+  <!-- 🌐 Powered by Footer -->
+<div class="text-center mt-5 mb-3 text-muted small">
+    Powered by <a href="https://urbancode.in" class="text-decoration-none fw-semibold" target="_blank">Urbancode Edutech Solutions Private Limited</a>
+  </div>
 </body>
 </html>
