@@ -20,6 +20,15 @@
 
     <h2 class="text-center mb-4">👤 Candidate List</h2>
 
+    <div class="row justify-content-center mb-4">
+      <div class="col-md-6 col-sm-12">
+        <div class="input-group">
+          <input type="text" id="newCandidateName" class="form-control" placeholder="Enter new candidate name..." />
+          <button class="btn btn-primary" onclick="addNewCandidate()">➕ Add Candidate</button>
+        </div>
+      </div>
+    </div>
+
     <div class="row mb-4">
       <div class="col-md-6 mb-2">
         <input type="file" class="form-control" id="excelFile" />
@@ -31,6 +40,7 @@
         <button class="btn btn-info w-100" onclick="exportToExcel()">📤 Export to Excel</button>
       </div>
     </div>
+    
 
     <div class="row mb-3">
       <div class="col-md-6 mx-auto">
@@ -56,6 +66,36 @@
       </table>
     </div>
   </div>
+
+  <script>
+    function addNewCandidate() {
+  const nameInput = document.getElementById("newCandidateName");
+  const newName = nameInput.value.trim();
+
+  if (!newName) {
+    return Swal.fire("Warning", "Please enter a candidate name.", "warning");
+  }
+
+  // Check for duplicate names
+  if (members.some(m => m.name.toLowerCase() === newName.toLowerCase())) {
+    return Swal.fire("Duplicate", "Candidate already exists!", "info");
+  }
+
+  const newCandidate = {
+    id: (members.length + 1).toString(),
+    name: newName,
+    scan: { entry: false, food: false, gift: false }
+  };
+
+  members.push(newCandidate);
+  localStorage.setItem("members", JSON.stringify(members));
+  renderTable(members);
+  nameInput.value = "";
+
+  Swal.fire("Added!", `${newName} has been added successfully.`, "success");
+}
+
+  </script>
 
   <script>
     let members = [];

@@ -126,26 +126,36 @@
   
     const alreadyWarned = new Set();
 
-function onScanSuccess(decodedText) {
+    function onScanSuccess(decodedText) {
+  if (scanCooldown) return;
+
+  scanCooldown = true;
+  setTimeout(() => {
+    scanCooldown = false;
+  }, 5000); // 5 seconds cooldown
+
   const found = members.find(m => m.name === decodedText.trim());
 
   if (!found) {
-    return Swal.fire("Error", "Name not found in Excel list", "error");
+    Swal.fire("Error", "Name not found in Excel list", "error");
+    return;
   }
 
   if (found.scan?.[scanMode]) {
     if (!alreadyWarned.has(found.name)) {
       alreadyWarned.add(found.name);
-      return Swal.fire("Already Scanned", `${scanMode.toUpperCase()} already marked for ${found.name}`, "info");
+      Swal.fire("Already Scanned", `${scanMode.toUpperCase()} already marked for ${found.name}`, "info");
     }
-    return; // silently ignore further scans for same user
+    return;
   }
 
   found.scan[scanMode] = true;
   localStorage.setItem("members", JSON.stringify(members));
+
   Swal.fire("Success", `${scanMode.toUpperCase()} marked for ${found.name}`, "success");
   renderScanTable();
 }
+
 
   
     window.onload = () => {
