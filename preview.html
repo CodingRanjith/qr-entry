@@ -3,153 +3,180 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>BB Meet | QR Preview</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+  <title>BB Meet | QR Pass</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     body {
       margin: 0;
-      background: linear-gradient(to bottom right, #eef5ff, #ffffff);
+      background: url('img/meet.jpg') no-repeat center center fixed;
+      background-size: cover;
       font-family: 'Segoe UI', sans-serif;
-      color: #333;
+      color: #fff3b0;
       overflow-x: hidden;
+      text-align: center;
     }
-
+  
+    /* ✨ Logo Layout */
     .logos {
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 25px;
+      gap: 20px;
       padding-top: 20px;
+      flex-wrap: wrap;
     }
-
-    .logos img {
-      height: 60px;
-    }
-
-    .welcome-heading {
-      font-size: 2rem;
-      font-weight: 700;
-      text-align: center;
-      margin: 20px 0 10px;
-      animation: fadeIn 1s ease-in-out, bounce 2s infinite;
-      color: #0d6efd;
-    }
-
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-5px); }
-    }
-
-    .gif-box {
-      text-align: center;
-      margin-bottom: 15px;
-    }
-
-    .gif-box img {
-      width: 80px;
-      animation: zoomIn 1.5s ease-out;
-    }
-
-    @keyframes zoomIn {
-      0% { transform: scale(0.5); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-
-    .card-box {
-      max-width: 500px;
-      margin: 0 auto;
-      background: rgba(255, 255, 255, 0.7);
-      backdrop-filter: blur(14px);
-      border-radius: 16px;
-      padding: 40px 30px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      text-align: center;
-    }
-
-    .attendee-name {
-      font-size: 1.6rem;
-      font-weight: 600;
-      margin-bottom: 25px;
-      color: #003974;
-    }
-
-    canvas {
+  
+    .bb-logo {
+      height: 90px;
+      width: auto;
       border-radius: 12px;
-      box-shadow: 0 0 12px rgba(0, 123, 255, 0.3);
+      box-shadow: 0 0 25px rgba(255, 215, 0, 0.8), 0 5px 15px rgba(0, 0, 0, 0.4);
+      transform: scale(1.05);
+      z-index: 1;
+    }
+  
+    .urbancode-logo {
+      height: 45px;
+      opacity: 0.9;
+      transform: translateY(10px);
+      filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.2));
+    }
+  
+    /* 👑 Heading with Stage Glow */
+    h2.welcome {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #ffd700;
+      margin-top: 10px;
       margin-bottom: 20px;
+      text-shadow: 1px 1px 2px #000, 0 0 8px #ffcc00, 0 0 12px #ffcc00;
+      animation: flicker 2s infinite;
     }
-
-    .btn-download {
-      font-size: 1rem;
-      padding: 10px 25px;
-      background: #0d6efd;
+  
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.9; text-shadow: 0 0 10px #fff700; }
+    }
+  
+    /* 🎟️ Event Pass Container */
+    .card-box {
+      max-width: 520px;
+      margin: 20px auto;
+      background: linear-gradient(to bottom right, rgba(0, 0, 0, 0.5), rgba(55, 0, 0, 0.4));
+      border-radius: 20px;
+      padding: 40px 30px;
+      border: 2px solid rgba(255, 215, 0, 0.6);
+      box-shadow:
+        0 4px 15px rgba(0, 0, 0, 0.5),
+        0 0 30px rgba(255, 215, 0, 0.2),
+        inset 0 0 20px rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(6px);
+    }
+  
+    .attendee-name {
+      font-size: 1.8rem;
+      font-weight: 700;
       color: #fff;
+      margin-bottom: 25px;
+      text-shadow: 1px 1px 2px #000;
+    }
+  
+    /* 🎯 QR code area */
+    canvas {
+      border-radius: 15px;
+      background: #fff;
+      padding: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+    }
+  
+    /* ✨ Golden Button */
+    .btn-golden {
+      background: linear-gradient(145deg, #ffd700, #ffae00);
+      color: #2d0000;
+      font-weight: bold;
       border: none;
-      border-radius: 8px;
-      transition: 0.3s;
+      border-radius: 12px;
+      padding: 12px 30px;
+      font-size: 16px;
+      transition: 0.4s ease-in-out;
+      box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
     }
-
-    .btn-download:hover {
-      background: #084298;
+  
+    .btn-golden:hover {
+      background: linear-gradient(145deg, #ffae00, #ffd700);
+      box-shadow: 0 0 12px #ffcc00, 0 0 20px #ffd700;
+      transform: translateY(-2px);
     }
-
+  
+    /* 🧾 Footer CTA */
     .footer-cta {
-      text-align: center;
-      margin-top: 40px;
+      margin-top: 50px;
       font-size: 0.95rem;
-      color: #555;
+      color: #222;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 12px 25px;
+      border-radius: 10px;
+      display: inline-block;
+      font-weight: 500;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     }
-
+  
     .footer-cta a {
-      color: #0d6efd;
+      color: #b8860b;
       font-weight: 600;
       text-decoration: none;
     }
-
+  
     .footer-cta a:hover {
       text-decoration: underline;
+      color: #ff8c00;
     }
-
+  
+    /* 🌐 Responsive */
     @media (max-width: 576px) {
-      .attendee-name {
-        font-size: 1.3rem;
-      }
-
       .logos {
         flex-direction: column;
-        gap: 10px;
+        gap: 15px;
       }
-
+  
+      .attendee-name {
+        font-size: 1.5rem;
+      }
+  
       .card-box {
-        margin: 0 15px;
+        margin: 20px 15px;
       }
     }
   </style>
+  
 </head>
 <body>
 
-  <!-- 🧠 Logos -->
-  <div class="logos">
-    <img src="img/bb.jpg" alt="BB Meet" />
-    <img src="img/logo.png" alt="Urbancode" />
-  </div>
+  <!-- 👑 Logo Row -->
+<div class="logos mb-2">
+  <img src="img/bb.jpg" alt="BB Meet Logo" class="bb-logo" />
+  <img src="img/logo.png" alt="Urbancode Logo" class="urbancode-logo" />
+</div>
 
-  <!-- 🎉 Animated Heading -->
-  <div class="welcome-heading">🎉 Welcome to BB Meet</div>
+<h2 class="welcome">🎉 Welcome to BB Meetup</h2>
 
-  <!-- 🧾 QR Card -->
+
+  <!-- 🔲 QR Card -->
   <div class="card-box">
     <div class="attendee-name" id="qrName">Loading...</div>
     <canvas id="qrCanvas"></canvas>
-    <button id="downloadBtn" class="btn btn-download">⬇️ Download QR Pass</button>
+    <button id="downloadBtn" class="btn btn-golden">⬇️ Download QR Pass</button>
   </div>
 
-  <!-- 💬 Contact Footer -->
+  <!-- 🔗 Footer -->
   <div class="footer-cta">
     Need a custom website or app for your business?<br>
-    <a href="https://urbancode.in/projects/services.html" target="_blank">Contact Urbancode Edutech Solutions Pvt Ltd</a>
+    <a href="https://urbancode.in/projects/services.html" target="_blank">
+      Contact Urbancode Edutech Solutions Pvt Ltd
+    </a>
   </div>
 
   <script>
@@ -181,57 +208,5 @@
       };
     }
   </script>
-
-  <canvas id="background-canvas"></canvas>
-
-<script>
-  const canvas = document.getElementById("background-canvas");
-  const ctx = canvas.getContext("2d");
-
-  canvas.style.position = "fixed";
-  canvas.style.top = 0;
-  canvas.style.left = 0;
-  canvas.style.zIndex = "-1";
-  canvas.style.pointerEvents = "none";
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-
-  const colors = ["#0d6efd", "#6610f2", "#d63384", "#198754", "#fd7e14"];
-  const particles = Array.from({ length: 60 }, () => ({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
-    radius: Math.random() * 2 + 1,
-    color: colors[Math.floor(Math.random() * colors.length)],
-    vx: (Math.random() - 0.5) * 0.7,
-    vy: (Math.random() - 0.5) * 0.7
-  }));
-
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    particles.forEach(p => {
-      p.x += p.vx;
-      p.y += p.vy;
-
-      if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-      if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-      ctx.fillStyle = p.color;
-      ctx.fill();
-    });
-
-    requestAnimationFrame(draw);
-  }
-
-  draw();
-
-  window.addEventListener("resize", () => {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  });
-</script>
-
 </body>
 </html>
